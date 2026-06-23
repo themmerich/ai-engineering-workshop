@@ -1,12 +1,10 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { GlassmorphicLight } from './core/glassmorphic-light';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [GlassmorphicLight],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
-export class App {
-  protected readonly title = signal('ai-engineering-workshop');
-}
+export class App {}

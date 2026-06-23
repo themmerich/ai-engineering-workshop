@@ -28,6 +28,8 @@ Key conventions that differ from older Angular projects — follow them when add
 
 UI components come from **PrimeNG 21** (`primeng`, `@primeng/themes`, `primeicons`). It uses the styled-mode theming configured in `app.config.ts` via `providePrimeNG({ theme: { preset: Aura } })` alongside `provideAnimationsAsync()` — there are no theme CSS imports (only `primeicons/primeicons.css` in `styles.scss`). Import PrimeNG modules directly into a component's `imports` array. See `src/app/pages/demo/` for a working example.
 
+**Tailwind CSS v4** is wired in via `@tailwindcss/postcss` (`.postcssrc.json`). Because dart-sass can't resolve `@import "tailwindcss"`, the Tailwind entry lives in its own `src/styles.css` (`@import 'tailwindcss'; @plugin 'tailwindcss-primeui';`), listed alongside `src/styles.scss` in `angular.json`. The `tailwindcss-primeui` plugin supplies the `surface-*`/`primary-*` color tokens and PrimeNG-aligned `animate-*` utilities the templates use. The app shell lives in `src/app/core/glassmorphic-light.ts` and is rendered as the root layout (owns the single `<router-outlet>`).
+
 PrimeNG 21 declares a peer dependency on Angular 21 but runs fine on this Angular 22 project. `.npmrc` sets `legacy-peer-deps=true` so installs succeed despite the mismatch — keep using `npm install` normally; do not remove that setting unless a PrimeNG release officially supports Angular 22.
 
 ## TypeScript
