@@ -1,0 +1,14 @@
+# Build output and caches
+/dist
+/.angular
+/coverage
+
+# Dependencies
+/node_modules
+
+# Generated / lock files
+package-lock.json
+
+# Claude Code skill references (vendored docs)
+/.claude/skills
+/.agents
