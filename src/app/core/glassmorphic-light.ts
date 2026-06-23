@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { CommonModule, DOCUMENT } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { BadgeModule } from 'primeng/badge';
 import { StyleClassModule } from 'primeng/styleclass';
@@ -260,6 +260,18 @@ import { StyleClassModule } from 'primeng/styleclass';
               <i class="pi pi-bars text-xl! leading-none!"></i>
             </a>
             <div class="flex items-center gap-8">
+              <button
+                type="button"
+                (click)="toggleDarkMode()"
+                [attr.aria-label]="isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+                [attr.aria-pressed]="isDark()"
+                class="flex items-center justify-center cursor-pointer bg-transparent border-0 p-0 text-surface-700 dark:text-surface-200 hover:text-surface-900 dark:hover:text-surface-0 transition-colors"
+              >
+                <i
+                  [class]="isDark() ? 'pi pi-sun' : 'pi pi-moon'"
+                  class="text-xl! leading-tight!"
+                ></i>
+              </button>
               <i
                 class="pi pi-bell text-xl! leading-tight! text-surface-700 dark:text-surface-200 cursor-pointer"
               ></i>
@@ -278,4 +290,15 @@ import { StyleClassModule } from 'primeng/styleclass';
     </div>
   `,
 })
-export class GlassmorphicLight {}
+export class GlassmorphicLight {
+  private readonly document = inject(DOCUMENT);
+
+  readonly isDark = signal(
+    this.document.documentElement.classList.contains('dark'),
+  );
+
+  toggleDarkMode(): void {
+    const dark = this.document.documentElement.classList.toggle('dark');
+    this.isDark.set(dark);
+  }
+}
