@@ -1,0 +1,118 @@
+<div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-1">
+    <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Dashboard</h1>
+    <p class="text-surface-600 dark:text-surface-300">Überblick über deine Trainingsaktivität.</p>
+  </div>
+
+  <!-- KPI cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    @for (stat of stats; track stat.label) {
+      <div
+        class="rounded-xl border p-5 backdrop-blur-lg bg-white/70 dark:bg-surface-900/70 border-white/30 dark:border-surface-700/30"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex flex-col gap-1">
+            <span class="text-sm text-surface-500 dark:text-surface-400">{{ stat.label }}</span>
+            <span class="text-2xl font-semibold text-surface-900 dark:text-surface-0">{{
+              stat.value
+            }}</span>
+            <span class="text-xs text-surface-500 dark:text-surface-400">{{ stat.sublabel }}</span>
+          </div>
+          <span
+            class="flex items-center justify-center w-11 h-11 rounded-lg"
+            [class]="stat.iconClass"
+          >
+            <i [class]="stat.icon" class="text-lg!"></i>
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Charts -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div
+      class="lg:col-span-2 rounded-xl border p-5 backdrop-blur-lg bg-white/70 dark:bg-surface-900/70 border-white/30 dark:border-surface-700/30"
+    >
+      <h2 class="text-base font-semibold text-surface-900 dark:text-surface-0 mb-4">
+        Trainingseinheiten pro Monat
+      </h2>
+      <div class="h-72">
+        <p-chart type="bar" [data]="sessionsChart()" [options]="chartOptions()" height="100%" />
+      </div>
+    </div>
+
+    <div
+      class="rounded-xl border p-5 backdrop-blur-lg bg-white/70 dark:bg-surface-900/70 border-white/30 dark:border-surface-700/30"
+    >
+      <h2 class="text-base font-semibold text-surface-900 dark:text-surface-0 mb-4">
+        Trainingsfokus
+      </h2>
+      <div class="h-72">
+        <p-chart
+          type="doughnut"
+          [data]="focusChart()"
+          [options]="doughnutOptions()"
+          height="100%"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent sessions + goals -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div
+      class="rounded-xl border p-5 backdrop-blur-lg bg-white/70 dark:bg-surface-900/70 border-white/30 dark:border-surface-700/30"
+    >
+      <h2 class="text-base font-semibold text-surface-900 dark:text-surface-0 mb-4">
+        Letzte Einheiten
+      </h2>
+      <ul class="flex flex-col divide-y divide-surface-200/70 dark:divide-surface-700/50">
+        @for (session of recentSessions; track session.date) {
+          <li class="flex items-center gap-3 py-3">
+            <span
+              class="flex items-center justify-center w-9 h-9 rounded-full bg-surface-100 dark:bg-surface-800 text-surface-600 dark:text-surface-300 shrink-0"
+            >
+              <i class="pi pi-check text-sm!"></i>
+            </span>
+            <div class="flex flex-col">
+              <span class="text-sm font-medium text-surface-900 dark:text-surface-0">{{
+                session.location
+              }}</span>
+              <span class="text-xs text-surface-500 dark:text-surface-400">{{ session.date }}</span>
+            </div>
+            <div class="ml-auto flex items-center gap-3">
+              <p-tag [value]="session.focus" [severity]="session.severity" />
+              <span class="text-sm text-surface-600 dark:text-surface-300 w-24 text-right">{{
+                session.duration
+              }}</span>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div
+      class="rounded-xl border p-5 backdrop-blur-lg bg-white/70 dark:bg-surface-900/70 border-white/30 dark:border-surface-700/30"
+    >
+      <h2 class="text-base font-semibold text-surface-900 dark:text-surface-0 mb-4">
+        Ziele diesen Monat
+      </h2>
+      <div class="flex flex-col gap-5">
+        @for (goal of goals; track goal.label) {
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center justify-between text-sm">
+              <span class="font-medium text-surface-800 dark:text-surface-100">{{
+                goal.label
+              }}</span>
+              <span class="text-surface-500 dark:text-surface-400"
+                >{{ goal.current }} / {{ goal.target }} {{ goal.unit }}</span
+              >
+            </div>
+            <p-progressbar [value]="progress(goal)" [showValue]="false" styleClass="h-2!" />
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
