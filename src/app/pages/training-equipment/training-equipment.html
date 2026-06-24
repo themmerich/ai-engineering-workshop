@@ -1,0 +1,116 @@
+<div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-1">
+    <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Trainingsgeräte</h1>
+    <p class="text-surface-600 dark:text-surface-300">
+      Übersicht der verfügbaren Trainingsübungen und der benötigten Geräte.
+    </p>
+  </div>
+
+  <div
+    class="rounded-xl overflow-hidden border backdrop-blur-lg bg-white/70 dark:bg-surface-900/70 border-white/30 dark:border-surface-700/30"
+  >
+    <p-table
+      #dt
+      [value]="exercises()"
+      dataKey="id"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      [globalFilterFields]="['name', 'muscleGroup', 'equipment', 'reps', 'difficulty']"
+    >
+      <ng-template pTemplate="caption">
+        <div class="flex justify-end">
+          <p-iconfield iconPosition="left">
+            <p-inputicon class="pi pi-search" />
+            <input
+              pInputText
+              type="text"
+              placeholder="Suchen…"
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            />
+          </p-iconfield>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="name">
+            <div class="flex items-center gap-1">
+              Übung
+              <p-sortIcon field="name" />
+              <p-columnFilter type="text" field="name" display="menu" />
+            </div>
+          </th>
+          <th pSortableColumn="muscleGroup">
+            <div class="flex items-center gap-1">
+              Muskelgruppe
+              <p-sortIcon field="muscleGroup" />
+              <p-columnFilter type="text" field="muscleGroup" display="menu" />
+            </div>
+          </th>
+          <th pSortableColumn="equipment">
+            <div class="flex items-center gap-1">
+              Gerät
+              <p-sortIcon field="equipment" />
+              <p-columnFilter type="text" field="equipment" display="menu" />
+            </div>
+          </th>
+          <th pSortableColumn="sets">
+            <div class="flex items-center justify-center gap-1">
+              Sätze
+              <p-sortIcon field="sets" />
+              <p-columnFilter type="numeric" field="sets" display="menu" />
+            </div>
+          </th>
+          <th pSortableColumn="reps">
+            <div class="flex items-center gap-1">
+              Wiederholungen
+              <p-sortIcon field="reps" />
+              <p-columnFilter type="text" field="reps" display="menu" />
+            </div>
+          </th>
+          <th pSortableColumn="difficulty">
+            <div class="flex items-center gap-1">
+              Schwierigkeit
+              <p-sortIcon field="difficulty" />
+              <p-columnFilter field="difficulty" matchMode="equals" display="menu">
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-select
+                    [ngModel]="value"
+                    [options]="difficulties"
+                    (onChange)="filter($event.value)"
+                    placeholder="Alle"
+                    [showClear]="true"
+                    styleClass="w-full"
+                  />
+                </ng-template>
+              </p-columnFilter>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-exercise>
+        <tr>
+          <td class="font-medium">{{ exercise.name }}</td>
+          <td>{{ exercise.muscleGroup }}</td>
+          <td>{{ exercise.equipment }}</td>
+          <td class="text-center">{{ exercise.sets }}</td>
+          <td>{{ exercise.reps }}</td>
+          <td>
+            <p-tag
+              [value]="exercise.difficulty"
+              [severity]="difficultySeverity(exercise.difficulty)"
+            />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="6" class="text-center text-surface-500 dark:text-surface-400 py-6">
+            Keine Übungen gefunden.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

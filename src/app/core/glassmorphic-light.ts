@@ -1,13 +1,20 @@
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BadgeModule } from 'primeng/badge';
 import { StyleClassModule } from 'primeng/styleclass';
 
 @Component({
   selector: 'app-glassmorphic-light',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, BadgeModule, StyleClassModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+    BadgeModule,
+    StyleClassModule,
+  ],
   template: `
     <div
       class="resize-container-7 min-h-screen flex relative lg:static bg-surface-0 dark:bg-surface-900 bg-linear-to-br from-blue-100 from-40% via-pink-200 via-80% to-indigo-200 dark:from-blue-300/80 dark:via-pink-300/80 dark:to-indigo-400/80"
@@ -53,6 +60,19 @@ import { StyleClassModule } from 'primeng/styleclass';
                 ></i>
               </div>
               <ul class="list-none p-0 m-0 overflow-hidden flex flex-col gap-1">
+                <li>
+                  <a
+                    routerLink="/"
+                    routerLinkActive="bg-white/80 dark:bg-surface-950/50 text-surface-900! dark:text-surface-0!"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    class="p-3 rounded-lg flex items-center gap-2 cursor-pointer text-surface-700 dark:text-surface-200 hover:text-surface-900 dark:hover:text-surface-0 hover:bg-white/80 dark:hover:bg-surface-950/50 duration-150 transition-colors group"
+                  >
+                    <i
+                      class="pi pi-server text-base! leading-tight! text-surface-700 dark:text-surface-200 group-hover:text-surface-900 dark:group-hover:text-surface-0"
+                    ></i>
+                    <span class="flex-1 text-base font-medium leading-tight">Trainingsgeräte</span>
+                  </a>
+                </li>
                 <li>
                   <a
                     class="p-3 rounded-lg flex items-center gap-2 cursor-pointer text-surface-700 dark:text-surface-200 hover:text-surface-900 dark:hover:text-surface-0 hover:bg-white/80 dark:hover:bg-surface-950/50 duration-150 transition-colors group"
@@ -293,9 +313,7 @@ import { StyleClassModule } from 'primeng/styleclass';
 export class GlassmorphicLight {
   private readonly document = inject(DOCUMENT);
 
-  readonly isDark = signal(
-    this.document.documentElement.classList.contains('dark'),
-  );
+  readonly isDark = signal(this.document.documentElement.classList.contains('dark'));
 
   toggleDarkMode(): void {
     const dark = this.document.documentElement.classList.toggle('dark');
