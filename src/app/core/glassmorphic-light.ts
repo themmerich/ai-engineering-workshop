@@ -58,6 +58,8 @@ import { StyleClassModule } from 'primeng/styleclass';
               <ul class="list-none p-0 m-0 overflow-hidden flex flex-col gap-1">
                 <li>
                   <a
+                    routerLink="/dashboard"
+                    routerLinkActive="bg-white/80 dark:bg-surface-950/50 text-surface-900! dark:text-surface-0!"
                     class="p-3 rounded-lg flex items-center gap-2 cursor-pointer text-surface-700 dark:text-surface-200 hover:text-surface-900 dark:hover:text-surface-0 hover:bg-white/80 dark:hover:bg-surface-950/50 duration-150 transition-colors group"
                   >
                     <i
