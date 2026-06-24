@@ -1,7 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -21,8 +24,11 @@ interface Exercise {
   selector: 'app-training-equipment',
   imports: [
     FormsModule,
+    ButtonModule,
+    DialogModule,
     IconFieldModule,
     InputIconModule,
+    InputNumberModule,
     InputTextModule,
     SelectModule,
     TableModule,
@@ -109,6 +115,9 @@ export class TrainingEquipment {
     },
   ]);
 
+  protected readonly dialogVisible = signal(false);
+  protected draft: Omit<Exercise, 'id'> = this.emptyDraft();
+
   protected difficultySeverity(difficulty: Exercise['difficulty']): Tag['severity'] {
     switch (difficulty) {
       case 'Einfach':
@@ -118,5 +127,30 @@ export class TrainingEquipment {
       case 'Schwer':
         return 'danger';
     }
+  }
+
+  openNew(): void {
+    this.draft = this.emptyDraft();
+    this.dialogVisible.set(true);
+  }
+
+  save(): void {
+    const name = this.draft.name.trim();
+    if (!name) return;
+
+    const id = this.exercises().reduce((max, e) => Math.max(max, e.id), 0) + 1;
+    this.exercises.update((list) => [...list, { id, ...this.draft, name }]);
+    this.dialogVisible.set(false);
+  }
+
+  private emptyDraft(): Omit<Exercise, 'id'> {
+    return {
+      name: '',
+      muscleGroup: '',
+      equipment: '',
+      sets: 3,
+      reps: '',
+      difficulty: 'Mittel',
+    };
   }
 }
