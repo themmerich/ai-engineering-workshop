@@ -45,12 +45,13 @@
           <th>Übungen</th>
           <th style="width: 8rem">Dauer</th>
           <th>Anmerkungen</th>
+          <th style="width: 7rem" class="text-center">Aktionen</th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="groupheader" let-session>
         <tr pRowGroupHeader>
-          <td colspan="5" class="bg-surface-100/60 dark:bg-surface-800/40">
+          <td colspan="6" class="bg-surface-100/60 dark:bg-surface-800/40">
             <div class="flex items-center gap-2 font-semibold text-surface-900 dark:text-surface-0">
               <i class="pi pi-calendar text-sm!"></i>
               {{ session.monthLabel }}
@@ -67,20 +68,43 @@
           <td class="font-medium">{{ session.date | date: 'dd.MM.yyyy, HH:mm' }} Uhr</td>
           <td>{{ session.location }}</td>
           <td>
-            <div class="flex flex-wrap gap-1">
+            <div class="flex flex-col gap-0.5">
               @for (ex of session.exercises; track $index) {
-                <p-tag severity="secondary" [value]="ex.exercise + ' ' + ex.sets + '×' + ex.reps" />
+                <div class="text-sm">
+                  <span class="font-medium text-surface-800 dark:text-surface-100">{{
+                    ex.exercise
+                  }}</span>
+                  <span class="text-surface-500 dark:text-surface-400"> — {{ summarize(ex) }}</span>
+                </div>
               }
             </div>
           </td>
           <td>{{ formatDuration(session.duration) }}</td>
           <td class="max-w-xs text-surface-600 dark:text-surface-300">{{ session.notes }}</td>
+          <td>
+            <div class="flex justify-center gap-1">
+              <p-button
+                icon="pi pi-pencil"
+                [text]="true"
+                [rounded]="true"
+                severity="secondary"
+                (onClick)="openEdit(session)"
+              />
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="danger"
+                (onClick)="confirmDelete(session)"
+              />
+            </div>
+          </td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5" class="text-center text-surface-500 dark:text-surface-400 py-6">
+          <td colspan="6" class="text-center text-surface-500 dark:text-surface-400 py-6">
             Keine Trainingseinheiten gefunden.
           </td>
         </tr>
@@ -89,16 +113,31 @@
   </div>
 </div>
 
+<p-confirmdialog />
+
 <p-dialog
-  header="Neue Trainingseinheit"
+  [header]="editingId === null ? 'Neue Trainingseinheit' : 'Trainingseinheit bearbeiten'"
   [visible]="dialogVisible()"
   (visibleChange)="dialogVisible.set($event)"
   [modal]="true"
-  [style]="{ width: '44rem' }"
+  [style]="{ width: '64rem', 'max-width': '95vw' }"
+  [contentStyle]="{ 'min-height': '32rem' }"
   [draggable]="false"
 >
   <div class="flex flex-col gap-4 pt-2">
     <div class="flex gap-4">
+      <div class="flex flex-col gap-1 flex-1">
+        <label for="location" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+          >Ort</label
+        >
+        <input
+          id="location"
+          pInputText
+          [(ngModel)]="draft.location"
+          placeholder="z. B. Fitnessstudio"
+          autocomplete="off"
+        />
+      </div>
       <div class="flex flex-col gap-1 flex-1">
         <label for="date" class="text-sm font-medium text-surface-700 dark:text-surface-200"
           >Datum &amp; Uhrzeit</label
@@ -112,18 +151,6 @@
           [showIcon]="true"
           [maxDate]="today"
           styleClass="w-full"
-        />
-      </div>
-      <div class="flex flex-col gap-1 flex-1">
-        <label for="location" class="text-sm font-medium text-surface-700 dark:text-surface-200"
-          >Ort</label
-        >
-        <input
-          id="location"
-          pInputText
-          [(ngModel)]="draft.location"
-          placeholder="z. B. Fitnessstudio"
-          autocomplete="off"
         />
       </div>
     </div>
@@ -142,27 +169,24 @@
       />
     </div>
 
-    <div class="flex flex-col gap-2">
+    <div class="flex flex-col gap-3">
       <span class="text-sm font-medium text-surface-700 dark:text-surface-200">Übungen</span>
 
-      <div class="flex flex-col gap-2">
-        @for (row of draft.exercises; track $index) {
+      @for (row of draft.exercises; track $index) {
+        <div
+          class="flex flex-col gap-3 rounded-lg border border-surface-200 dark:border-surface-700 p-3"
+        >
           <div class="flex gap-2 items-center">
             <p-select
               [(ngModel)]="row.exercise"
               [options]="exerciseOptions"
+              optionLabel="name"
+              optionValue="name"
+              (onChange)="onExerciseChange(row)"
               placeholder="Übung wählen…"
               [filter]="true"
               styleClass="flex-1"
             />
-            <p-inputNumber
-              [(ngModel)]="row.sets"
-              [min]="1"
-              [max]="20"
-              placeholder="Sätze"
-              styleClass="w-24"
-            />
-            <input pInputText [(ngModel)]="row.reps" placeholder="Wdh" class="w-24" />
             <p-button
               icon="pi pi-trash"
               severity="danger"
@@ -172,15 +196,87 @@
               (onClick)="removeExerciseRow($index)"
             />
           </div>
-        }
-      </div>
+
+          @if (isSetsBased(row.kind)) {
+            <div class="flex flex-col gap-2">
+              @for (set of row.sets; track $index) {
+                <div class="flex gap-2 items-center">
+                  <span class="w-16 text-sm text-surface-600 dark:text-surface-300"
+                    >{{ $index + 1 }}. Satz</span
+                  >
+                  @if (row.kind === 'strength') {
+                    <p-inputNumber
+                      [(ngModel)]="set.weight"
+                      suffix=" kg"
+                      [min]="0"
+                      [maxFractionDigits]="1"
+                      placeholder="Gewicht"
+                      styleClass="w-32"
+                    />
+                  }
+                  <p-inputNumber
+                    [(ngModel)]="set.reps"
+                    [min]="1"
+                    [max]="100"
+                    placeholder="Wdh"
+                    styleClass="w-28"
+                  />
+                  <p-button
+                    icon="pi pi-times"
+                    severity="secondary"
+                    [text]="true"
+                    [rounded]="true"
+                    [disabled]="row.sets.length === 1"
+                    (onClick)="removeSet(row, $index)"
+                  />
+                </div>
+              }
+              <div>
+                <p-button
+                  label="Satz hinzufügen"
+                  icon="pi pi-plus"
+                  severity="secondary"
+                  [text]="true"
+                  size="small"
+                  (onClick)="addSet(row)"
+                />
+              </div>
+            </div>
+          } @else if (row.kind === 'cardio') {
+            <div class="flex gap-4">
+              <div class="flex flex-col gap-1 flex-1">
+                <span class="text-sm text-surface-600 dark:text-surface-300">Dauer</span>
+                <p-inputNumber
+                  [(ngModel)]="row.duration"
+                  suffix=" min"
+                  [min]="1"
+                  [max]="600"
+                  styleClass="w-full"
+                />
+              </div>
+              <div class="flex flex-col gap-1 flex-1">
+                <span class="text-sm text-surface-600 dark:text-surface-300"
+                  >Geschwindigkeit <span class="text-surface-400">(optional)</span></span
+                >
+                <p-inputNumber
+                  [(ngModel)]="row.speed"
+                  suffix=" km/h"
+                  [min]="0"
+                  [maxFractionDigits]="1"
+                  styleClass="w-full"
+                />
+              </div>
+            </div>
+          }
+        </div>
+      }
 
       <div>
         <p-button
           label="Übung hinzufügen"
           icon="pi pi-plus"
           severity="secondary"
-          [text]="true"
+          [outlined]="true"
           (onClick)="addExerciseRow()"
         />
       </div>
