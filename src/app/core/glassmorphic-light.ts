@@ -27,21 +27,17 @@ import { StyleClassModule } from 'primeng/styleclass';
           <div class="flex items-center p-4 gap-4 shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="43"
-              height="43"
-              viewBox="0 0 43 43"
+              viewBox="0 0 24 24"
               fill="none"
               class="w-10 h-10"
             >
               <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M21.5 42.0498C33.098 42.0498 42.5 32.6477 42.5 21.0498C42.5 9.45183 33.098 0.0498047 21.5 0.0498047C9.902 0.0498047 0.5 9.45183 0.5 21.0498C0.5 32.6477 9.902 42.0498 21.5 42.0498ZM28.0513 9.83248C28.3702 8.69975 27.2709 8.02994 26.267 8.74516L12.2528 18.7288C11.164 19.5045 11.3353 21.0498 12.51 21.0498H16.2003V21.0212H23.3926L17.5323 23.089L14.9487 32.2671C14.6299 33.3999 15.729 34.0697 16.733 33.3544L30.7472 23.3708C31.836 22.5951 31.6646 21.0498 30.49 21.0498H24.8937L28.0513 9.83248Z"
+                d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"
                 class="fill-surface-900 dark:fill-surface-0"
               />
             </svg>
             <div class="text-surface-900 dark:text-surface-0 text-lg font-semibold leading-tight">
-              ZenTrail
+              Workout
             </div>
           </div>
           <div class="flex-1 overflow-y-auto p-2 flex flex-col gap-4">
@@ -60,19 +56,6 @@ import { StyleClassModule } from 'primeng/styleclass';
                 ></i>
               </div>
               <ul class="list-none p-0 m-0 overflow-hidden flex flex-col gap-1">
-                <li>
-                  <a
-                    routerLink="/"
-                    routerLinkActive="bg-white/80 dark:bg-surface-950/50 text-surface-900! dark:text-surface-0!"
-                    [routerLinkActiveOptions]="{ exact: true }"
-                    class="p-3 rounded-lg flex items-center gap-2 cursor-pointer text-surface-700 dark:text-surface-200 hover:text-surface-900 dark:hover:text-surface-0 hover:bg-white/80 dark:hover:bg-surface-950/50 duration-150 transition-colors group"
-                  >
-                    <i
-                      class="pi pi-server text-base! leading-tight! text-surface-700 dark:text-surface-200 group-hover:text-surface-900 dark:group-hover:text-surface-0"
-                    ></i>
-                    <span class="flex-1 text-base font-medium leading-tight">Trainingsgeräte</span>
-                  </a>
-                </li>
                 <li>
                   <a
                     class="p-3 rounded-lg flex items-center gap-2 cursor-pointer text-surface-700 dark:text-surface-200 hover:text-surface-900 dark:hover:text-surface-0 hover:bg-white/80 dark:hover:bg-surface-950/50 duration-150 transition-colors group"
@@ -97,6 +80,31 @@ import { StyleClassModule } from 'primeng/styleclass';
                       size="small"
                       class="text-xs! font-bold! h-5! min-w-5! rounded-xl!"
                     ></p-badge>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    routerLink="/"
+                    routerLinkActive="bg-white/80 dark:bg-surface-950/50 text-surface-900! dark:text-surface-0!"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    class="p-3 rounded-lg flex items-center gap-2 cursor-pointer text-surface-700 dark:text-surface-200 hover:text-surface-900 dark:hover:text-surface-0 hover:bg-white/80 dark:hover:bg-surface-950/50 duration-150 transition-colors group"
+                  >
+                    <i
+                      class="pi pi-server text-base! leading-tight! text-surface-700 dark:text-surface-200 group-hover:text-surface-900 dark:group-hover:text-surface-0"
+                    ></i>
+                    <span class="flex-1 text-base font-medium leading-tight">Trainingsgeräte</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    routerLink="/uebungen"
+                    routerLinkActive="bg-white/80 dark:bg-surface-950/50 text-surface-900! dark:text-surface-0!"
+                    class="p-3 rounded-lg flex items-center gap-2 cursor-pointer text-surface-700 dark:text-surface-200 hover:text-surface-900 dark:hover:text-surface-0 hover:bg-white/80 dark:hover:bg-surface-950/50 duration-150 transition-colors group"
+                  >
+                    <i
+                      class="pi pi-bolt text-base! leading-tight! text-surface-700 dark:text-surface-200 group-hover:text-surface-900 dark:group-hover:text-surface-0"
+                    ></i>
+                    <span class="flex-1 text-base font-medium leading-tight">Übungen</span>
                   </a>
                 </li>
                 <li>
