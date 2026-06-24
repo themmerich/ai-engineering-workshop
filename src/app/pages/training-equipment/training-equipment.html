@@ -1,9 +1,7 @@
 <div class="flex flex-col gap-6">
   <div class="flex flex-col gap-1">
     <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Trainingsgeräte</h1>
-    <p class="text-surface-600 dark:text-surface-300">
-      Übersicht der verfügbaren Trainingsübungen und der benötigten Geräte.
-    </p>
+    <p class="text-surface-600 dark:text-surface-300">Übersicht der vorhandenen Trainingsgeräte.</p>
   </div>
 
   <div
@@ -11,10 +9,10 @@
   >
     <p-table
       #dt
-      [value]="exercises()"
+      [value]="equipment()"
       dataKey="id"
-      [tableStyle]="{ 'min-width': '50rem' }"
-      [globalFilterFields]="['name', 'muscleGroup', 'equipment', 'reps', 'difficulty']"
+      [tableStyle]="{ 'min-width': '40rem' }"
+      [globalFilterFields]="['name']"
     >
       <ng-template pTemplate="caption">
         <div class="flex items-center gap-4">
@@ -38,80 +36,48 @@
         <tr>
           <th pSortableColumn="name">
             <div class="flex items-center gap-1">
-              Übung
+              Name
               <p-sortIcon field="name" />
               <p-columnFilter type="text" field="name" display="menu" />
             </div>
           </th>
-          <th pSortableColumn="muscleGroup">
-            <div class="flex items-center gap-1">
-              Muskelgruppe
-              <p-sortIcon field="muscleGroup" />
-              <p-columnFilter type="text" field="muscleGroup" display="menu" />
+          <th pSortableColumn="weight">
+            <div class="flex items-center justify-end gap-1">
+              Gewicht
+              <p-sortIcon field="weight" />
+              <p-columnFilter type="numeric" field="weight" display="menu" />
             </div>
           </th>
-          <th pSortableColumn="equipment">
+          <th pSortableColumn="purchaseDate">
             <div class="flex items-center gap-1">
-              Gerät
-              <p-sortIcon field="equipment" />
-              <p-columnFilter type="text" field="equipment" display="menu" />
+              Kaufdatum
+              <p-sortIcon field="purchaseDate" />
+              <p-columnFilter type="date" field="purchaseDate" display="menu" />
             </div>
           </th>
-          <th pSortableColumn="sets">
-            <div class="flex items-center justify-center gap-1">
-              Sätze
-              <p-sortIcon field="sets" />
-              <p-columnFilter type="numeric" field="sets" display="menu" />
-            </div>
-          </th>
-          <th pSortableColumn="reps">
-            <div class="flex items-center gap-1">
-              Wiederholungen
-              <p-sortIcon field="reps" />
-              <p-columnFilter type="text" field="reps" display="menu" />
-            </div>
-          </th>
-          <th pSortableColumn="difficulty">
-            <div class="flex items-center gap-1">
-              Schwierigkeit
-              <p-sortIcon field="difficulty" />
-              <p-columnFilter field="difficulty" matchMode="equals" display="menu">
-                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                  <p-select
-                    [ngModel]="value"
-                    [options]="difficulties"
-                    (onChange)="filter($event.value)"
-                    placeholder="Alle"
-                    [showClear]="true"
-                    styleClass="w-full"
-                  />
-                </ng-template>
-              </p-columnFilter>
+          <th pSortableColumn="price">
+            <div class="flex items-center justify-end gap-1">
+              Preis
+              <p-sortIcon field="price" />
+              <p-columnFilter type="numeric" field="price" display="menu" />
             </div>
           </th>
         </tr>
       </ng-template>
 
-      <ng-template pTemplate="body" let-exercise>
+      <ng-template pTemplate="body" let-item>
         <tr>
-          <td class="font-medium">{{ exercise.name }}</td>
-          <td>{{ exercise.muscleGroup }}</td>
-          <td>{{ exercise.equipment }}</td>
-          <td class="text-center">{{ exercise.sets }}</td>
-          <td>{{ exercise.reps }}</td>
-          <td>
-            <p-tag
-              [value]="exercise.difficulty"
-              [severity]="difficultySeverity(exercise.difficulty)"
-            />
-          </td>
+          <td class="font-medium">{{ item.name }}</td>
+          <td class="text-right">{{ formatWeight(item.weight) }}</td>
+          <td>{{ item.purchaseDate | date: 'dd.MM.yyyy' }}</td>
+          <td class="text-right">{{ formatPrice(item.price) }}</td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="6" class="text-center text-surface-500 dark:text-surface-400 py-6">
-            Keine Übungen gefunden.
+          <td colspan="4" class="text-center text-surface-500 dark:text-surface-400 py-6">
+            Keine Trainingsgeräte gefunden.
           </td>
         </tr>
       </ng-template>
@@ -130,55 +96,55 @@
   <div class="flex flex-col gap-4 pt-2">
     <div class="flex flex-col gap-1">
       <label for="name" class="text-sm font-medium text-surface-700 dark:text-surface-200"
-        >Übung</label
+        >Name</label
       >
       <input id="name" pInputText [(ngModel)]="draft.name" autocomplete="off" />
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="muscleGroup" class="text-sm font-medium text-surface-700 dark:text-surface-200"
-        >Muskelgruppe</label
+      <label for="weight" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+        >Gewicht
+        <span class="font-normal text-surface-500 dark:text-surface-400"
+          >(nur bei Hanteln)</span
+        ></label
       >
-      <input id="muscleGroup" pInputText [(ngModel)]="draft.muscleGroup" autocomplete="off" />
+      <p-inputNumber
+        inputId="weight"
+        [(ngModel)]="draft.weight"
+        suffix=" kg"
+        [min]="0"
+        [maxFractionDigits]="2"
+        locale="de-DE"
+        placeholder="—"
+        styleClass="w-full"
+      />
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="equipment" class="text-sm font-medium text-surface-700 dark:text-surface-200"
-        >Gerät</label
+      <label for="price" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+        >Preis</label
       >
-      <input id="equipment" pInputText [(ngModel)]="draft.equipment" autocomplete="off" />
-    </div>
-
-    <div class="flex gap-4">
-      <div class="flex flex-col gap-1 flex-1">
-        <label for="sets" class="text-sm font-medium text-surface-700 dark:text-surface-200"
-          >Sätze</label
-        >
-        <p-inputNumber
-          inputId="sets"
-          [(ngModel)]="draft.sets"
-          [min]="1"
-          [max]="20"
-          [showButtons]="true"
-          styleClass="w-full"
-        />
-      </div>
-      <div class="flex flex-col gap-1 flex-1">
-        <label for="reps" class="text-sm font-medium text-surface-700 dark:text-surface-200"
-          >Wiederholungen</label
-        >
-        <input id="reps" pInputText [(ngModel)]="draft.reps" autocomplete="off" />
-      </div>
+      <p-inputNumber
+        inputId="price"
+        [(ngModel)]="draft.price"
+        mode="currency"
+        currency="EUR"
+        locale="de-DE"
+        [min]="0"
+        styleClass="w-full"
+      />
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="difficulty" class="text-sm font-medium text-surface-700 dark:text-surface-200"
-        >Schwierigkeit</label
+      <label for="purchaseDate" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+        >Kaufdatum</label
       >
-      <p-select
-        inputId="difficulty"
-        [(ngModel)]="draft.difficulty"
-        [options]="difficulties"
+      <p-datepicker
+        inputId="purchaseDate"
+        [(ngModel)]="draft.purchaseDate"
+        dateFormat="dd.mm.yy"
+        [showIcon]="true"
+        [maxDate]="today"
         styleClass="w-full"
       />
     </div>
@@ -194,7 +160,7 @@
     <p-button
       label="Speichern"
       icon="pi pi-check"
-      [disabled]="!draft.name.trim()"
+      [disabled]="!draft.name.trim() || draft.price === null || draft.purchaseDate === null"
       (onClick)="save()"
     />
   </ng-template>
