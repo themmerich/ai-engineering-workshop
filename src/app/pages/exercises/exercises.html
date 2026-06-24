@@ -1,0 +1,213 @@
+<div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-1">
+    <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Übungen</h1>
+    <p class="text-surface-600 dark:text-surface-300">
+      Übersicht der verfügbaren Trainingsübungen.
+    </p>
+  </div>
+
+  <div
+    class="rounded-xl overflow-hidden border backdrop-blur-lg bg-white/70 dark:bg-surface-900/70 border-white/30 dark:border-surface-700/30"
+  >
+    <p-table
+      #dt
+      [value]="exercises()"
+      dataKey="id"
+      [tableStyle]="{ 'min-width': '60rem' }"
+      [globalFilterFields]="['name', 'category', 'muscleGroup']"
+    >
+      <ng-template pTemplate="caption">
+        <div class="flex items-center gap-4">
+          <div class="flex-1"></div>
+          <p-iconfield iconPosition="left">
+            <p-inputicon class="pi pi-search" />
+            <input
+              pInputText
+              type="text"
+              placeholder="Suchen…"
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            />
+          </p-iconfield>
+          <div class="flex-1 flex justify-end">
+            <p-button label="Neu" icon="pi pi-plus" (onClick)="openNew()" />
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="name">
+            <div class="flex items-center gap-1">
+              Name
+              <p-sortIcon field="name" />
+              <p-columnFilter type="text" field="name" display="menu" />
+            </div>
+          </th>
+          <th pSortableColumn="category">
+            <div class="flex items-center gap-1">
+              Kategorie
+              <p-sortIcon field="category" />
+              <p-columnFilter field="category" matchMode="equals" display="menu">
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-select
+                    [ngModel]="value"
+                    [options]="categories"
+                    (onChange)="filter($event.value)"
+                    placeholder="Alle"
+                    [showClear]="true"
+                    styleClass="w-full"
+                  />
+                </ng-template>
+              </p-columnFilter>
+            </div>
+          </th>
+          <th pSortableColumn="muscleGroup">
+            <div class="flex items-center gap-1">
+              Muskelgruppe
+              <p-sortIcon field="muscleGroup" />
+              <p-columnFilter type="text" field="muscleGroup" display="menu" />
+            </div>
+          </th>
+          <th>Geräte</th>
+          <th pSortableColumn="difficulty">
+            <div class="flex items-center gap-1">
+              Schwierigkeit
+              <p-sortIcon field="difficulty" />
+              <p-columnFilter field="difficulty" matchMode="equals" display="menu">
+                <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                  <p-select
+                    [ngModel]="value"
+                    [options]="difficulties"
+                    (onChange)="filter($event.value)"
+                    placeholder="Alle"
+                    [showClear]="true"
+                    styleClass="w-full"
+                  />
+                </ng-template>
+              </p-columnFilter>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td class="font-medium">{{ item.name }}</td>
+          <td>{{ item.category }}</td>
+          <td>{{ item.muscleGroup }}</td>
+          <td>
+            <div class="flex flex-wrap gap-1">
+              @for (g of item.equipment; track g) {
+                <p-tag [value]="g" severity="secondary" />
+              }
+            </div>
+          </td>
+          <td>
+            <p-tag [value]="item.difficulty" [severity]="difficultySeverity(item.difficulty)" />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center text-surface-500 dark:text-surface-400 py-6">
+            Keine Übungen gefunden.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<p-dialog
+  header="Neue Übung"
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: '34rem' }"
+  [draggable]="false"
+>
+  <div class="flex flex-col gap-4 pt-2">
+    <div class="flex flex-col gap-1">
+      <label for="name" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+        >Name</label
+      >
+      <input id="name" pInputText [(ngModel)]="draft.name" autocomplete="off" />
+    </div>
+
+    <div class="flex gap-4">
+      <div class="flex flex-col gap-1 flex-1">
+        <label for="category" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+          >Kategorie</label
+        >
+        <p-select
+          inputId="category"
+          [(ngModel)]="draft.category"
+          [options]="categories"
+          placeholder="Wählen…"
+          styleClass="w-full"
+        />
+      </div>
+      <div class="flex flex-col gap-1 flex-1">
+        <label for="difficulty" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+          >Schwierigkeit</label
+        >
+        <p-select
+          inputId="difficulty"
+          [(ngModel)]="draft.difficulty"
+          [options]="difficulties"
+          placeholder="Wählen…"
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="muscleGroup" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+        >Muskelgruppe</label
+      >
+      <input id="muscleGroup" pInputText [(ngModel)]="draft.muscleGroup" autocomplete="off" />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="equipment" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+        >Geräte</label
+      >
+      <p-multiSelect
+        inputId="equipment"
+        [(ngModel)]="draft.equipment"
+        [options]="equipmentOptions"
+        placeholder="Geräte wählen…"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="description" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+        >Beschreibung</label
+      >
+      <textarea
+        id="description"
+        pTextarea
+        [(ngModel)]="draft.description"
+        rows="3"
+        class="w-full"
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Abbrechen"
+      severity="secondary"
+      [text]="true"
+      (onClick)="dialogVisible.set(false)"
+    />
+    <p-button
+      label="Speichern"
+      icon="pi pi-check"
+      [disabled]="!draft.name.trim() || draft.category === null || draft.difficulty === null"
+      (onClick)="save()"
+    />
+  </ng-template>
+</p-dialog>
