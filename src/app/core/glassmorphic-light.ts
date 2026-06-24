@@ -109,6 +109,20 @@ import { StyleClassModule } from 'primeng/styleclass';
                 </li>
                 <li>
                   <a
+                    routerLink="/trainingseinheiten"
+                    routerLinkActive="bg-white/80 dark:bg-surface-950/50 text-surface-900! dark:text-surface-0!"
+                    class="p-3 rounded-lg flex items-center gap-2 cursor-pointer text-surface-700 dark:text-surface-200 hover:text-surface-900 dark:hover:text-surface-0 hover:bg-white/80 dark:hover:bg-surface-950/50 duration-150 transition-colors group"
+                  >
+                    <i
+                      class="pi pi-history text-base! leading-tight! text-surface-700 dark:text-surface-200 group-hover:text-surface-900 dark:group-hover:text-surface-0"
+                    ></i>
+                    <span class="flex-1 text-base font-medium leading-tight"
+                      >Trainingseinheiten</span
+                    >
+                  </a>
+                </li>
+                <li>
+                  <a
                     class="p-3 rounded-lg flex items-center gap-2 cursor-pointer text-surface-700 dark:text-surface-200 hover:text-surface-900 dark:hover:text-surface-0 hover:bg-white/80 dark:hover:bg-surface-950/50 duration-150 transition-colors group"
                   >
                     <i

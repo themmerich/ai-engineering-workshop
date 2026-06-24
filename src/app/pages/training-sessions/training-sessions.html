@@ -1,0 +1,206 @@
+<div class="flex flex-col gap-6">
+  <div class="flex flex-col gap-1">
+    <h1 class="text-2xl font-semibold text-surface-900 dark:text-surface-0">Trainingseinheiten</h1>
+    <p class="text-surface-600 dark:text-surface-300">
+      Erfasste Trainingseinheiten, gruppiert nach Monat.
+    </p>
+  </div>
+
+  <div
+    class="rounded-xl overflow-hidden border backdrop-blur-lg bg-white/70 dark:bg-surface-900/70 border-white/30 dark:border-surface-700/30"
+  >
+    <p-table
+      #dt
+      [value]="sessions()"
+      dataKey="id"
+      rowGroupMode="subheader"
+      groupRowsBy="monthKey"
+      sortField="monthKey"
+      [sortOrder]="-1"
+      [tableStyle]="{ 'min-width': '64rem' }"
+      [globalFilterFields]="['location', 'notes']"
+    >
+      <ng-template pTemplate="caption">
+        <div class="flex items-center gap-4">
+          <div class="flex-1"></div>
+          <p-iconfield iconPosition="left">
+            <p-inputicon class="pi pi-search" />
+            <input
+              pInputText
+              type="text"
+              placeholder="Suchen…"
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            />
+          </p-iconfield>
+          <div class="flex-1 flex justify-end">
+            <p-button label="Neu" icon="pi pi-plus" (onClick)="openNew()" />
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 14rem">Datum &amp; Uhrzeit</th>
+          <th style="width: 10rem">Ort</th>
+          <th>Übungen</th>
+          <th style="width: 8rem">Dauer</th>
+          <th>Anmerkungen</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="groupheader" let-session>
+        <tr pRowGroupHeader>
+          <td colspan="5" class="bg-surface-100/60 dark:bg-surface-800/40">
+            <div class="flex items-center gap-2 font-semibold text-surface-900 dark:text-surface-0">
+              <i class="pi pi-calendar text-sm!"></i>
+              {{ session.monthLabel }}
+              <span class="font-normal text-surface-500 dark:text-surface-400">
+                · {{ countForMonth(session.monthKey) }} Einheiten
+              </span>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-session>
+        <tr>
+          <td class="font-medium">{{ session.date | date: 'dd.MM.yyyy, HH:mm' }} Uhr</td>
+          <td>{{ session.location }}</td>
+          <td>
+            <div class="flex flex-wrap gap-1">
+              @for (ex of session.exercises; track $index) {
+                <p-tag severity="secondary" [value]="ex.exercise + ' ' + ex.sets + '×' + ex.reps" />
+              }
+            </div>
+          </td>
+          <td>{{ formatDuration(session.duration) }}</td>
+          <td class="max-w-xs text-surface-600 dark:text-surface-300">{{ session.notes }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="text-center text-surface-500 dark:text-surface-400 py-6">
+            Keine Trainingseinheiten gefunden.
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<p-dialog
+  header="Neue Trainingseinheit"
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [modal]="true"
+  [style]="{ width: '44rem' }"
+  [draggable]="false"
+>
+  <div class="flex flex-col gap-4 pt-2">
+    <div class="flex gap-4">
+      <div class="flex flex-col gap-1 flex-1">
+        <label for="date" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+          >Datum &amp; Uhrzeit</label
+        >
+        <p-datepicker
+          inputId="date"
+          [(ngModel)]="draft.date"
+          [showTime]="true"
+          hourFormat="24"
+          dateFormat="dd.mm.yy"
+          [showIcon]="true"
+          [maxDate]="today"
+          styleClass="w-full"
+        />
+      </div>
+      <div class="flex flex-col gap-1 flex-1">
+        <label for="location" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+          >Ort</label
+        >
+        <input
+          id="location"
+          pInputText
+          [(ngModel)]="draft.location"
+          placeholder="z. B. Fitnessstudio"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="duration" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+        >Dauer</label
+      >
+      <p-inputNumber
+        inputId="duration"
+        [(ngModel)]="draft.duration"
+        suffix=" min"
+        [min]="1"
+        [max]="600"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <span class="text-sm font-medium text-surface-700 dark:text-surface-200">Übungen</span>
+
+      <div class="flex flex-col gap-2">
+        @for (row of draft.exercises; track $index) {
+          <div class="flex gap-2 items-center">
+            <p-select
+              [(ngModel)]="row.exercise"
+              [options]="exerciseOptions"
+              placeholder="Übung wählen…"
+              [filter]="true"
+              styleClass="flex-1"
+            />
+            <p-inputNumber
+              [(ngModel)]="row.sets"
+              [min]="1"
+              [max]="20"
+              placeholder="Sätze"
+              styleClass="w-24"
+            />
+            <input pInputText [(ngModel)]="row.reps" placeholder="Wdh" class="w-24" />
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [text]="true"
+              [rounded]="true"
+              [disabled]="draft.exercises.length === 1"
+              (onClick)="removeExerciseRow($index)"
+            />
+          </div>
+        }
+      </div>
+
+      <div>
+        <p-button
+          label="Übung hinzufügen"
+          icon="pi pi-plus"
+          severity="secondary"
+          [text]="true"
+          (onClick)="addExerciseRow()"
+        />
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="notes" class="text-sm font-medium text-surface-700 dark:text-surface-200"
+        >Anmerkungen</label
+      >
+      <textarea id="notes" pTextarea [(ngModel)]="draft.notes" rows="3" class="w-full"></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Abbrechen"
+      severity="secondary"
+      [text]="true"
+      (onClick)="dialogVisible.set(false)"
+    />
+    <p-button label="Speichern" icon="pi pi-check" [disabled]="!canSave()" (onClick)="save()" />
+  </ng-template>
+</p-dialog>
